@@ -16,17 +16,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.tourbuddy.ui.theme.TourBuddyTheme
 import com.example.tourbuddy.viewmodel.LoginViewModel
-import androidx.activity.compose.LocalActivity
-import com.example.tourbuddy.viewmodel.LoginUiState
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
-    // Get the current activity context, which Firebase needs
+fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
+    // V V V V V UPDATED THIS LINE AS REQUESTED V V V V V
+    val activity = LocalContext.current as? Activity
+    // ^ ^ ^ ^ ^ UPDATED THIS LINE AS REQUESTED ^ ^ ^ ^ ^
 
-    val activity = LocalActivity.current
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.loginSuccess) {
+        if (uiState.loginSuccess) {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
 
     val backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
 
@@ -39,16 +47,10 @@ fun LoginScreen(viewModel: LoginViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                "Let's Get Started",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Text("Let's Get Started", fontSize = 32.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(16.dp))
 
             if (!uiState.isVerified) {
-                // Phone Number and OTP Fields
                 OutlinedTextField(
                     value = uiState.phoneNumber,
                     onValueChange = viewModel::onPhoneNumberChanged,
@@ -70,35 +72,23 @@ fun LoginScreen(viewModel: LoginViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = { viewModel.verifyOtp() },
-                        modifier = Modifier.fillMaxWidth().height(50.dp)
-                    ) {
+                    Button(onClick = { viewModel.verifyOtp() }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                         Text("Verify OTP")
                     }
                 } else {
                     Spacer(modifier = Modifier.height(24.dp))
-                    // In LoginScreen.kt
-
                     Button(
-                        onClick = {
-                            // This 'let' block only runs if activity is not null
-                            activity?.let {
-                                viewModel.sendOtp(it)
-                            }
-                        },
+                        onClick = { activity?.let { viewModel.sendOtp(it) } },
                         modifier = Modifier.fillMaxWidth().height(50.dp)
                     ) {
                         Text("Send OTP")
                     }
+                    TextButton(onClick = { viewModel.skipVerification() }) {
+                        Text("Skip for now (Dev)")
+                    }
                 }
             } else {
-                // Name Field after verification
-                Text(
-                    "Verification Successful!",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Verification Successful!", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(24.dp))
                 OutlinedTextField(
                     value = uiState.userName,
@@ -108,21 +98,16 @@ fun LoginScreen(viewModel: LoginViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(
-                    onClick = { viewModel.saveUserAndLogin() },
-                    modifier = Modifier.fillMaxWidth().height(50.dp)
-                ) {
+                Button(onClick = { viewModel.saveUserAndLogin() }, modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text("Enter Tour Buddy")
                 }
             }
 
-            // Show a loading indicator
             if (uiState.isLoading) {
                 Spacer(modifier = Modifier.height(16.dp))
                 CircularProgressIndicator()
             }
 
-            // Show any error messages
             uiState.error?.let {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = it, color = MaterialTheme.colorScheme.error)
@@ -131,7 +116,6 @@ fun LoginScreen(viewModel: LoginViewModel) {
     }
 }
 
-// LoginBackground and Preview functions remain the same...
 @Composable
 fun LoginBackground(color: Color) {
     Canvas(modifier = Modifier.fillMaxSize()) {
@@ -156,7 +140,6 @@ fun LoginBackground(color: Color) {
 @Composable
 fun LoginScreenPreview() {
     TourBuddyTheme {
-        // We can't preview the full ViewModel, so we'll just show the UI
-        // You can still use the interactive preview to check your layout
+        // Preview remains empty
     }
 }

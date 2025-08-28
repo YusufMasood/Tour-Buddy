@@ -100,6 +100,12 @@ class LoginViewModel(private val userDao: UserDao) : ViewModel() {
             _uiState.update { it.copy(loginSuccess = true) }
         }
     }
+
+    // V V V V V THIS FUNCTION WAS ADDED V V V V V
+    fun skipVerification() {
+        _uiState.update { it.copy(isVerified = true) }
+    }
+    // ^ ^ ^ ^ ^ THIS FUNCTION WAS ADDED ^ ^ ^ ^ ^
 }
 
 // Factory to create the ViewModel with its UserDao dependency

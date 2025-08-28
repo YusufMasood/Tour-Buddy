@@ -12,11 +12,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.tourbuddy.ui.screens.HomeScreen
 import com.example.tourbuddy.ui.screens.LoginScreen
+import com.example.tourbuddy.ui.screens.ParentScreen
 import com.example.tourbuddy.ui.screens.WelcomeScreen
 import com.example.tourbuddy.ui.theme.TourBuddyTheme
 import com.example.tourbuddy.viewmodel.LoginViewModel
 import com.example.tourbuddy.viewmodel.LoginViewModelFactory
+import com.example.tourbuddy.viewmodel.LocationViewModel
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +42,20 @@ class MainActivity : ComponentActivity() {
                         factory = LoginViewModelFactory(userDao)
                     )
 
+                    val locationViewModel: LocationViewModel = viewModel()
+
+
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "welcome") {
                         composable("welcome") { WelcomeScreen(navController) }
                         // Pass the ViewModel to the LoginScreen
-                        composable("login") { LoginScreen(viewModel = loginViewModel) }
+                        composable("login") { LoginScreen(viewModel = loginViewModel, navController = navController) }
+
+                        composable("home") {   ParentScreen() }
+
+
                     }
+
                 }
             }
         }
