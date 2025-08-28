@@ -60,7 +60,7 @@ fun WelcomeScreen(navController : NavController) {
             Spacer(modifier = Modifier.weight(2f))
 
             Button(
-                onClick = { navController.navigate("Login Screen") },
+                onClick = { navController.navigate("login") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
