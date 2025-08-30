@@ -8,6 +8,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,9 +22,50 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tourbuddy.ui.theme.TourBuddyTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import android.Manifest
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.tourbuddy.data.EnableLocationSetting
+import com.example.tourbuddy.data.isLocationEnabled
+import com.google.accompanist.permissions.isGranted
 
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun WelcomeScreen(navController : NavController) {
+
+    val context = LocalContext.current
+    val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
+    var showLocationPrompt by remember { mutableStateOf(false) }
+
+    // This effect runs once to ask for app permission
+    LaunchedEffect(Unit) {
+        locationPermissionState.launchPermissionRequest()
+    }
+
+    // This effect runs when the app permission status changes
+    LaunchedEffect(locationPermissionState.status) {
+        if (locationPermissionState.status.isGranted) {
+            // If permission is granted, check if the device's GPS is actually on
+            if (!isLocationEnabled(context)) {
+                showLocationPrompt = true
+            }
+        }
+    }
+
+    if (showLocationPrompt) {
+        // This composable will show the dialog to enable GPS
+        EnableLocationSetting(
+            onLocationSettingEnabled = { showLocationPrompt = false },
+            onLocationSettingCancelled = { /* User cancelled, you might want to show a message */ }
+        )
+    }
+
     // 1. Get the color from the theme here.
     val backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
 

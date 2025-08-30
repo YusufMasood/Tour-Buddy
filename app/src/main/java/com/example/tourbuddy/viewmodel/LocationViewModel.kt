@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 data class LocationState(
+    val latitude: Double? = null,
+    val longitude: Double? = null,
     val city: String? = null,
     val isLoading: Boolean = true
 )
@@ -14,7 +16,9 @@ class LocationViewModel : ViewModel() {
     private val _locationState = MutableStateFlow(LocationState())
     val locationState = _locationState.asStateFlow()
 
-    fun onCityFetched(city: String) {
-        _locationState.update { it.copy(city = city, isLoading = false) }
+    fun onLocationFetched(lat: Double, lng: Double, city: String) {
+        _locationState.update {
+            it.copy(latitude = lat, longitude = lng, city = city, isLoading = false)
+        }
     }
 }
