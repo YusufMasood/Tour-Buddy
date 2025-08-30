@@ -4,7 +4,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-    id("com.google.secrets_gradle_plugin") version "0.4"
+
 }
 
 android {
@@ -21,7 +21,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        buildConfigField("String", "google_api_key", "\"${project.property("MAPS_API_KEY")}\"")
 
     }
 
