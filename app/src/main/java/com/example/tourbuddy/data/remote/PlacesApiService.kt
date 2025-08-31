@@ -1,5 +1,6 @@
 package com.example.tourbuddy.data.remote
 
+import com.android.volley.BuildConfig
 import retrofit2.http.GET
 import retrofit2.http.Query
 

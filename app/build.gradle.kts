@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,12 +7,28 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 
+    }
+
+
+secrets {
+    propertiesFileName = "secrets.properties"
+
 }
+
+val secrets = Properties()
+file("../secrets.properties").inputStream().use { secrets.load(it) }
 
 
 android {
     namespace = "com.example.tourbuddy"
     compileSdk = 34
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+
 
     defaultConfig {
         applicationId = "com.example.tourbuddy"
@@ -23,6 +41,14 @@ android {
             useSupportLibrary = true
 
         }
+
+
+        buildConfigField(
+            "String",
+            "MAPS_API_KEY",
+            "\"${secrets["MAPS_API_KEY"]}\""
+        )
+
 
     }
 
@@ -52,9 +78,7 @@ android {
     }
 }
 
-secrets {
-    propertiesFileName = "secrets.properties"
-}
+
 
 dependencies {
     // Core & UI
@@ -95,4 +119,7 @@ dependencies {
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
+
+    //Places api
+    implementation("com.google.android.libraries.places:places:3.5.0")
 }

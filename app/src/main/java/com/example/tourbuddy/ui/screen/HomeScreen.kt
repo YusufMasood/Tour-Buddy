@@ -14,17 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.tourbuddy.BuildConfig
 import com.example.tourbuddy.data.getCurrentLocation
-import com.example.tourbuddy.ui.theme.TourBuddyTheme
 import com.example.tourbuddy.viewmodel.*
 import com.google.accompanist.permissions.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import com.example.tourbuddy.R
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -45,7 +45,7 @@ fun HomeScreen(locationViewModel: LocationViewModel, placesViewModel: PlacesView
     LaunchedEffect(locationState.latitude, placesState.searchQuery, placesState.selectedCategory) {
         locationState.latitude?.let { lat ->
             locationState.longitude?.let { lng ->
-                val apiKey = "YOUR_API_KEY" // <-- IMPORTANT: PASTE YOUR API KEY HERE
+                val apiKey = BuildConfig.MAPS_API_KEY
                 placesViewModel.fetchPlaces("${lat},${lng}", apiKey)
             }
         }

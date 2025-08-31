@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import kotlin.getValue
+import kotlin.jvm.java
 
 object RetrofitClient {
     private const val BASE_URL = "https://maps.googleapis.com/"

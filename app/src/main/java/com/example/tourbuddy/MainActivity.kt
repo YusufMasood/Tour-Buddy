@@ -12,14 +12,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.tourbuddy.data.remote.RetrofitClient
+import com.example.tourbuddy.repository.PlacesRepository
 import com.example.tourbuddy.ui.screens.HomeScreen
 import com.example.tourbuddy.ui.screens.LoginScreen
 import com.example.tourbuddy.ui.screens.ParentScreen
 import com.example.tourbuddy.ui.screens.WelcomeScreen
 import com.example.tourbuddy.ui.theme.TourBuddyTheme
-import com.example.tourbuddy.viewmodel.LoginViewModel
-import com.example.tourbuddy.viewmodel.LoginViewModelFactory
-import com.example.tourbuddy.viewmodel.LocationViewModel
+import com.example.tourbuddy.viewmodel.*
+import com.google.android.libraries.places.api.Places
 
 
 class MainActivity : ComponentActivity() {
@@ -27,9 +28,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Get the UserDao from our Application class
         val application = application as TourBuddyApplication
         val userDao = application.database.userDao()
+
+        val apiKey = BuildConfig.MAPS_API_KEY
+
+        if(!Places.isInitialized()){
+            Places.initialize(applicationContext,apiKey)
+        }
+
+
+        val placesClient = Places.createClient(this)
+
+
+        val placesApiService = RetrofitClient.apiService
+
+        val placesRepository = PlacesRepository(placesApiService, placesClient)
 
         setContent {
             TourBuddyTheme {
@@ -37,25 +51,26 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Create the ViewModel using our custom factory
+                    // Create ViewModels using their factories
                     val loginViewModel: LoginViewModel = viewModel(
                         factory = LoginViewModelFactory(userDao)
                     )
-
                     val locationViewModel: LocationViewModel = viewModel()
 
+                    val placesViewModel: PlacesViewModel = viewModel(
+                        factory = PlacesViewModelFactory(placesRepository)
+                    )
 
                     val navController = rememberNavController()
                     NavHost(navController = navController, startDestination = "welcome") {
                         composable("welcome") { WelcomeScreen(navController) }
-                        // Pass the ViewModel to the LoginScreen
                         composable("login") { LoginScreen(viewModel = loginViewModel, navController = navController) }
 
-                        composable("home") {   ParentScreen() }
+                        composable("home") {
+                            ParentScreen()
 
-
+                        }
                     }
-
                 }
             }
         }
